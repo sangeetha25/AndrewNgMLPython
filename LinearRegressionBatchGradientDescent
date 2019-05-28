@@ -1,0 +1,71 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 27 08:01:44 2019
+
+@author: Chitra - Sangeetha
+"""
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+data = pd.read_csv(r'C:\Users\Chitra - Sangeetha\.spyder-py3\workspace\Spyder_workspace\Practice\machine-learning-ex1\ex1\ex1data1.txt',sep=',',encoding='ISO-8859-1',header=None)
+print(data.head())
+
+'data shape'
+print(data.shape)
+
+data.dropna(inplace=True)
+data.reset_index(drop=True,inplace=True)
+
+train_x = data.iloc[:,0].values.reshape(data.shape[0],1)
+train_y = data.iloc[:,1].values.reshape(data.shape[0],1)
+m = train_x.shape[0]
+
+'plot the distribution of data'
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set(title='Linear Regression',xlabel='X',ylabel='Y')
+ax.scatter(train_x,train_y,marker='x',color=['red'])
+plt.show()
+
+ones = np.ones((m,1))
+train_x = np.hstack((ones,train_x))
+
+n = train_x.shape[1]
+theta = np.zeros((n,1))
+temp_theta = theta.copy()
+h = np.dot(train_x,theta)
+
+'find cost'
+def cost(h,y,m):
+    j=(1/(2*m))*(sum((h-y)**2))
+    return j
+#cost(h,train_y,m)
+
+integrations=1500
+alpha=0.01
+
+'minimize cost'
+def gradientDescent(theta):
+    for i in range(theta.shape[0]):
+        temp_theta[i,0] = theta[i,0]-((alpha/m)*(np.dot(np.transpose(h-train_y),train_x[:,i].reshape(m,1))))
+    return temp_theta
+#gradientDescent(theta)
+
+for i in range(integrations):
+    theta = gradientDescent(theta)
+    h = np.dot(train_x,theta)
+    j = cost(h,train_y,m)
+#    print(j)    
+    predicted_y = np.dot(train_x,theta)
+    'final plot distribution'
+    'plot the distribution of data'
+    if i%200==0:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set(title='Linear Regression',xlabel='X',ylabel='Y')
+        ax.scatter(train_x[:,1].reshape(m,1),train_y,marker='x',color=['red'])
+        ax.plot(train_x[:,1].reshape(m,1),predicted_y,color='blue')
+        plt.show()
