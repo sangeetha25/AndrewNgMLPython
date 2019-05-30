@@ -1,0 +1,82 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+data = pd.read_csv(path_to_file)
+print(data.head())
+
+'data shape'
+print(data.shape)
+
+data.dropna(inplace=True)
+data.reset_index(drop=True,inplace=True)
+
+train_x = data.iloc[:,0].values.reshape(data.shape[0],1)
+train_y = data.iloc[:,1].values.reshape(data.shape[0],1)
+m = train_x.shape[0]
+
+'plot the distribution of data'
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set(title='Linear Regression',xlabel='X',ylabel='Y')
+ax.scatter(train_x,train_y,marker='x',color=['red'])
+plt.show()
+
+ones = np.ones((m,1))
+train_x = np.hstack((ones,train_x))
+
+n = train_x.shape[1]
+theta = np.zeros((n,1))
+temp_theta = theta.copy()
+h = np.dot(train_x,theta)
+
+'find cost'
+lamda=1
+def cost(h,y,m):
+    'Reg-array - (lambda/2m)*thetaj(theta=0 for j=0)'
+    reg = theta.copy()
+    reg[0,0]=0
+    j=((1/(2*m))*(sum((h-y)**2))+(lamda*sum(reg**2)))
+    return j
+cost(h,train_y,m)
+
+integrations=1500
+alpha=0.01
+
+'minimize cost'
+
+def gradientDescent(theta):
+    'Reg-array - (lambda/2m)*thetaj(theta=0 for j=0)'
+    reg = theta.copy()
+    reg[0,0]=0
+#    print(reg)
+#    print("theta")
+#    print(theta)
+    temp_var = (alpha/m)*(np.transpose(train_x)@((train_x@theta)-train_y))
+#    print("temp_var")
+#    print(temp_var)
+    temp_var = temp_var + (((alpha*lamda)/(2*m))*reg)
+#    print('temp_var_edited')
+#    print(temp_var)
+    temp_theta = theta- temp_var
+    return temp_theta
+#gradientDescent(theta)
+
+for i in range(integrations):
+    theta = gradientDescent(theta)
+    h = np.dot(train_x,theta)
+    j = cost(h,train_y,m)
+#    print(j)    
+    predicted_y = np.dot(train_x,theta)
+    'final plot distribution'
+    'plot the distribution of data'
+    if i%200==0:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set(title='Linear Regression',xlabel='X',ylabel='Y')
+        ax.scatter(train_x[:,1].reshape(m,1),train_y,marker='x',color=['red'])
+        ax.plot(train_x[:,1].reshape(m,1),predicted_y,color='blue')
+        plt.show()
+        
+  'Try the same of different values of lamda and observe the changes in cost'
