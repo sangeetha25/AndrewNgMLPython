@@ -1,0 +1,49 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+data = pd.read_csv(r'C:\Users\1085679\Documents\coursera_python_ml\machine-learning-ex1\ex1\ex1data1.txt',sep=',',encoding='ISO-8859-1',header=None)
+print(data.head())
+
+'data shape'
+print(data.shape)
+
+data.dropna(inplace=True)
+data.reset_index(drop=True,inplace=True)
+
+train_x = data.iloc[:,0].values.reshape(data.shape[0],1)
+train_y = data.iloc[:,1].values.reshape(data.shape[0],1)
+m = train_x.shape[0]
+
+'''Normal Equation
+y = theta * X
+y * x_transpose = theta * X * x_transpose
+theta  = (X*x_transpose)inverse * x_transpose * y'''
+
+try:
+    temp = np.linalg.inv(np.dot(np.transpose(train_x),train_x))
+except:
+    print('Equation is not invertible')
+    temp = np.zeros((train_x.shape[1],train_x.shape[1]))
+
+theta = np.dot(np.dot(temp,np.transpose(train_x)),train_y)
+h = np.dot(train_x,theta)
+
+
+'plot the distribution of data'
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set(title='Linear Regression',xlabel='X',ylabel='Y')
+ax.scatter(train_x,train_y,marker='x',color=['red'])
+ax.plot(train_x,h,color='blue')
+plt.show()
+
+'cost'
+def cost(h,y,m):
+    j=(1/(2*m))*(sum((h-y)**2))
+    return j
+
+print('Mean square error :'+str(cost(h,train_y,m)))
+
+'Not used generally since it costs O(N3) for computation'
