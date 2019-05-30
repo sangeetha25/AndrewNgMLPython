@@ -1,0 +1,88 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+data = pd.read_csv(path_to_file)
+print(data.head())
+print(data.shape)
+print(data.describe())
+print(data.info())
+
+train_y = data.iloc[:,-1]
+data = data.iloc[:,:-1]
+'feature normalization'
+def featureNormalization(X):
+    """
+    Take in numpy array of X values and return normalize X values,
+    the mean and standard deviation of each feature
+    """
+    mean=np.mean(X,axis=0)
+    std=np.std(X,axis=0) 
+    X_norm = (X - mean)/std    
+    return X_norm
+
+data = featureNormalization(data)
+data = pd.concat([data,train_y],axis=1)
+'split the data to input and output columns'
+data_pos = data[data.iloc[:,2]==1]
+data_neg = data[data.iloc[:,2]==0]
+train_x = data.iloc[:,:-1].values.reshape(data.shape[0],data.shape[1]-1)
+train_y = data.iloc[:,-1].values.reshape(data.shape[0],1)
+m = train_x.shape[0]
+
+'intialize theta'
+train_x = np.hstack((np.ones((m,1)),train_x)) 
+n = train_x.shape[1]
+theta = np.zeros((n,1))
+
+lamda=0.1
+def sigmoid(x):
+    return 1/(1+np.exp(-x))
+
+def costFunc(x,y,theta):
+    reg = theta.copy()
+    reg[0,0]=0
+    tmp = (-1/m)*((np.dot(np.transpose(y),np.log(sigmoid(x@theta))))+(np.dot(np.transpose(1-y),np.log(1-(sigmoid(x@theta))))))
+    j = tmp+(lamda*sum(reg**2))
+    return j
+
+costFunc(train_x,train_y,theta)
+
+alpha=0.01
+def gradient(x,y,theta):
+    reg = theta.copy()
+    reg[0,0]=0
+    temp = (alpha/m)*(np.transpose(x)@(sigmoid(x@theta)-y))
+    temp = temp + (((alpha*lamda)/(2*m))*reg)
+    theta = theta - temp
+    return theta    
+theta = gradient(train_x,train_y,theta)
+
+'minimize error'
+iterations=400
+J=[]
+for i in range(iterations):
+    theta = gradient(train_x,train_y,theta)
+    J.append(costFunc(train_x,train_y,theta).item())
+
+'plot-iterations vs cost'
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set(title='Gradient Descent',xlabel='Iterations',ylabel='Cost')
+ax.plot(list(range(iterations)),J,color='blue')
+plt.show()
+
+'predictions'
+h = train_x @ theta
+
+'plot the distribution of data'
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set(title='Logistic Regression',xlabel='X',ylabel='Y')
+ax.scatter(data_pos.iloc[:,0],data_pos.iloc[:,1],marker='+',color=['red'])
+ax.scatter(data_neg.iloc[:,0],data_neg.iloc[:,1],marker='o',color=['blue'])
+plt.legend(['Yes','No'],loc=0)
+c = theta[0,0]
+r = (-c-(theta[1,0]*data.iloc[:,0]))/theta[2,0]
+ax.plot(data.iloc[:,0],r,color='green')
+plt.show()
