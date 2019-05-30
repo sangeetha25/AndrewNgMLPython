@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-data = pd.read_csv(r'C:\Users\Chitra - Sangeetha\.spyder-py3\workspace\Spyder_workspace\Practice\machine-learning-ex1\ex1\ex1data1.txt',sep=',',encoding='ISO-8859-1',header=None)
+data = pd.read_csv(path_of_file)
 print(data.head())
 
 'data shape'
