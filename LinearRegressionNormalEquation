@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-data = pd.read_csv(r'C:\Users\1085679\Documents\coursera_python_ml\machine-learning-ex1\ex1\ex1data1.txt',sep=',',encoding='ISO-8859-1',header=None)
+data = pd.read_csv(path_to_file)
 print(data.head())
 
 'data shape'
