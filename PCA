@@ -1,0 +1,32 @@
+import pandas as pd
+import numpy as np
+'load data'
+data = pd.read_csv(path_to_file)
+print(data.shape)
+print(data.columns)
+print(data.head())
+print(data.info())
+print(data.describe())
+
+'standardization'
+for i in data.columns:
+    mean = np.mean(data.iloc[:,i])
+    std = np.std(data.iloc[:,i])
+    data.iloc[:,i]=data.iloc[:,i].apply(lambda x:(x-mean)/std)
+    
+'covariance matrix'
+x = np.cov(data.iloc[:,0],data.iloc[:,1])
+
+'eigen vectors and eigen values'
+y,z = np.linalg.eig()
+
+'Select the maximum eigen value and corresponding eigen vector
+m =max(y)
+for i in range(len(y)):
+    if y[i]==m:
+        print(i)
+        eigenvalue = y[i]
+        eigenvector = z[i]
+'Mulitply the eigen vector with original data'
+data_pca = np.dot(data,np.reshape(eigenvector,(2,1)))
+
