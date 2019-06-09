@@ -9,24 +9,30 @@ print(data.info())
 print(data.describe())
 
 'standardization'
+'to avoid the importance of the variable which has higher range'
 for i in data.columns:
     mean = np.mean(data.iloc[:,i])
     std = np.std(data.iloc[:,i])
     data.iloc[:,i]=data.iloc[:,i].apply(lambda x:(x-mean)/std)
     
-'covariance matrix'
+'''covariance matrix - to determine the linear relationship between variables, 
+if positive, variables increase or decrease in same direction, otherwise if one increases, other variable decreases'''
 x = np.cov(data.iloc[:,0],data.iloc[:,1])
 
 'eigen vectors and eigen values'
-y,z = np.linalg.eig()
+y,z = np.linalg.eig(x)
 
-'Select the maximum eigen value and corresponding eigen vector
+'Select the maximum eigen value and corresponding eigen vector'
+'maximum eigen value corresponds to maximum variance(most of information in data) in data'
 m =max(y)
 for i in range(len(y)):
     if y[i]==m:
         print(i)
         eigenvalue = y[i]
         eigenvector = z[i]
-'Mulitply the eigen vector with original data'
-data_pca = np.dot(data,np.reshape(eigenvector,(2,1)))
+
+'(1-(maximum(eigenvalue)/(sum_eigen_values)))*100 gives the percentage of information lost by dimensionality reduction'
+
+'Mulitply the eigen vector with original data to project the original data to a different dimension'
+data_pca = np.dot(data,np.reshape(eigenvector,(eigenvector.shape[0],1)))
 
